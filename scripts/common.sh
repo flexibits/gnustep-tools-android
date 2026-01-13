@@ -119,7 +119,14 @@ prepare_project () {
       if [ -f $patch ] ; then
         patch_name=`basename "$patch"`
         echo -e "\n### Applying $patch_name"
-        patch -p1 --forward < "$patch" || [ $? -eq 1 ]
+        if patch -p1 --forward --dry-run < "$patch" >/dev/null 2>&1; then
+          patch -p1 --forward < "$patch"
+        elif patch -p1 --reverse --dry-run < "$patch" >/dev/null 2>&1; then
+          echo -e "Patch already applied, skipping"
+        else
+          echo -e "Patch failed"
+          exit 1
+        fi
       fi
     done
   fi
