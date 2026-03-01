@@ -5,7 +5,7 @@ set -e # make any subsequent failing command exit the script
 . `dirname $0`/../scripts/common.sh
 
 PROJECT=libdispatch
-GITHUB_REPO=apple/swift-corelibs-libdispatch
+GITHUB_REPO=flexibits/apple-swift-corelibs-libdispatch
 
 # load environment and prepare project
 if ! prepare_project $PROJECT $GITHUB_REPO; then

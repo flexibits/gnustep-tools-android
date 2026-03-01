@@ -5,7 +5,7 @@ set -e # make any subsequent failing command exit the script
 . `dirname $0`/../scripts/common.sh
 
 PROJECT=gnustep-corebase
-GITHUB_REPO=gnustep/libs-corebase
+GITHUB_REPO=flexibits/gnustep-libs-corebase
 
 # load environment and prepare project
 if ! prepare_project $PROJECT $GITHUB_REPO; then
