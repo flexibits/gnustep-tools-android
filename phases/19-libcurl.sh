@@ -28,6 +28,10 @@ ${CMAKE} .. \
   -DBUILD_LIBCURL_DOCS=NO \
   -DCURL_USE_LIBPSL=NO \
   -DBUILD_MISC_DOCS=NO \
+  -DHTTP_ONLY=ON \
+  -DCURL_BROTLI=OFF \
+  -DCURL_ZSTD=OFF \
+  -DCURL_USE_OPENSSL=OFF \
 
 echo -e "\n### Building"
 make -j${MAKE_JOBS}
