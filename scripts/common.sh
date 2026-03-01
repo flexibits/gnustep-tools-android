@@ -11,25 +11,8 @@ export ROOT_DIR="$PWD"
 get_latest_github_release_tag () {
   GITHUB_REPO=$1
   TAG_PREFIX=$2
-  
-  # use GitHub token authentication on CI to prevent rate limit errors
-  if [ -n "$GITHUB_TOKEN" ]; then
-    GITHUB_AUTHORIZATION_HEADER="Authorization: Bearer $GITHUB_TOKEN"
-  fi
-  
-  # get the tags JSON from the GitHub API and parse it manually,
-  # or output it to stderr if the server returns an error
-  # per_page=100 is required for some repositories with a lot of beta tags
-  github_tags=`curl \
-    --silent --show-error --fail-with-body \
-    --header "$GITHUB_AUTHORIZATION_HEADER" \
-    https://api.github.com/repos/$GITHUB_REPO/tags?per_page=100`
 
-  echo "$github_tags" \
-    | grep '"name":' \
-    | sed -E 's/.*"([^"]+)".*/\1/' \
-    | egrep "^${TAG_PREFIX:-[a-z_-]+}[0-9]+[\._-][0-9]+([\._-][0-9]+)?\$" \
-    | head -n 1
+  curl -s "https://api.github.com/repos/$GITHUB_REPO/releases/latest" | sed -nzre 's,.*"tag_name":\s*"([^"]*)".*,\1,p'
 }
 
 prepare_project () {
@@ -51,7 +34,7 @@ prepare_project () {
       echo -e "\n### Downloading project"
       mkdir -p "$CACHE_ROOT"
       cd "$CACHE_ROOT"
-      curl -O -# $REPO
+      curl -L -O -# $REPO
     fi
 
     cd "$SRCROOT"
@@ -72,7 +55,12 @@ prepare_project () {
     
     if [ ! -d "$PROJECT" ]; then
       echo -e "\n### Cloning project"
-      git clone --recursive $REPO $PROJECT
+      if [ -n "$TAG" ]; then
+        branch_option="--branch $TAG"
+      else
+        branch_option=""
+      fi
+      git clone --recursive --depth 1 $branch_option $REPO $PROJECT
     fi
     
     cd "$PROJECT"
