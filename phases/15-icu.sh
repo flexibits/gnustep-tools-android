@@ -8,6 +8,14 @@ PROJECT=icu
 GITHUB_REPO=unicode-org/icu
 TAG=$(get_latest_github_release_tag $GITHUB_REPO release-)
 
+if [ -z "$TAG" ]; then
+  echo "Error: could not resolve latest ICU release tag" >&2
+  exit 1
+fi
+
+# Download the source archive instead of git clone (30MB vs 5GB).
+URL="https://github.com/${GITHUB_REPO}/archive/refs/tags/${TAG}.tar.gz"
+
 # don't clean project for subsequent ABIs so that the build for the current
 # machine is preserved, and because each ABI builds into separate directory
 set -- $ABI_NAMES # splits space-separated ABI list into $1, $2 etc.
@@ -16,7 +24,7 @@ if [ "${ABI_NAME}" != "$1" ]; then
 fi
 
 # load environment and prepare project
-if ! prepare_project $PROJECT $GITHUB_REPO $TAG; then
+if ! prepare_project $PROJECT "$URL"; then
   exit 0
 fi
 
@@ -58,7 +66,7 @@ if [ ! -d $CROSS_BUILD_DIR ]; then
 
   echo -e "\n### Building for $BUILD_PLATFORM"
   make -j${MAKE_JOBS}
-  
+
   cd ..
 fi
 
