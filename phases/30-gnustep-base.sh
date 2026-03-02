@@ -6,9 +6,10 @@ set -e # make any subsequent failing command exit the script
 
 PROJECT=gnustep-base
 GITHUB_REPO=flexibits/gnustep-libs-base
+BRANCH=ste/nsurl
 
 # load environment and prepare project
-if ! prepare_project $PROJECT $GITHUB_REPO; then
+if ! prepare_project $PROJECT $GITHUB_REPO $BRANCH; then
   exit 0
 fi
 
